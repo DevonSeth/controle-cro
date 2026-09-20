@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Controle do CRO — Haze Lab Company</title>
+<style>
+:root{--p:#6C3CF0;--p2:#8A5CFF;--dark:#111017;--dark2:#1A1722;--card:#211D2B;--line:#383044;--text:#F7F4FF;--muted:#AFA7BC;--white:#fff;--good:#B89CFF}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#0d0c11;color:var(--text)}
+header{background:linear-gradient(135deg,#15121d,#261a42);border-bottom:1px solid #34284c;padding:26px 22px}.wrap{max-width:1180px;margin:auto}
+.brand{display:flex;align-items:center;gap:14px}.logo{width:50px;height:50px;border:2px solid var(--p2);border-radius:14px;display:grid;place-items:center;font-weight:900;font-size:20px;color:var(--p2)}
+h1{margin:0;font-size:30px}.sub{color:var(--muted);margin-top:5px}.tabs{display:flex;gap:8px;margin:20px 0}
+.tab,.btn{border:1px solid #463a59;border-radius:11px;padding:10px 15px;font-weight:800;cursor:pointer}.tab{background:#17141e;color:#cfc7dc}.tab.active,.btn{background:var(--p);color:#fff;border-color:var(--p)}
+main{padding:0 22px 28px}.pane{display:none}.pane.active{display:block}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}.inputs{grid-column:span 4}.results{grid-column:span 8}.full{grid-column:1/-1}
+h2{font-size:18px;margin:0 0 14px}.field{margin:11px 0}.field label{font-size:12px;color:var(--muted);font-weight:800;display:flex;justify-content:space-between}
+input,select{width:100%;margin-top:6px;border:1px solid #473d55;border-radius:10px;padding:10px;font-size:15px;background:#17141e;color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.kpi{background:#18151f;border:1px solid #30293a;border-radius:14px;padding:14px}.kpi small{display:block;color:var(--muted);font-weight:800}.kpi strong{font-size:21px;color:var(--good);display:block;margin-top:5px}
+.funnel{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:18px}.stage{background:linear-gradient(135deg,#5630c6,#7b4cff);padding:15px 10px;border-radius:14px;text-align:center}.stage b{font-size:21px;display:block}.stage span{font-size:10px;opacity:.8}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:right}th:first-child,td:first-child{text-align:left}th{color:var(--muted)}
+.note,.source{font-size:12px;color:var(--muted);line-height:1.5}.bench{display:grid;grid-template-columns:1.35fr .65fr;gap:16px}.bench input{margin:0;padding:7px;text-align:right}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.report{display:none}
+@media(max-width:850px){.inputs,.results{grid-column:1/-1}.kpis{grid-template-columns:repeat(2,1fr)}.funnel{grid-template-columns:1fr}.bench{grid-template-columns:1fr}}
+@media print{
+ body{background:white;color:#19151f}.no-print,header,.tabs,.pane{display:none!important}.report{display:block!important;padding:0}
+ @page{size:A4;margin:13mm}.report-head{border-bottom:4px solid #6C3CF0;padding-bottom:10px;margin-bottom:15px}
+ .report h1{font-size:24px;color:#33205f}.report h2{font-size:15px;color:#5630c6;margin:17px 0 8px}
+ .meta{font-size:11px;color:#625b6b}.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.rbox{border:1px solid #ddd6e7;border-radius:8px;padding:8px}
+ .rbox small{display:block;color:#6e6677;font-size:9px}.rbox b{display:block;color:#33205f;font-size:15px;margin-top:3px}
+ .report table{font-size:10px}.report th,.report td{border-bottom:1px solid #e5dfeb;padding:7px}.foot{font-size:8px;color:#777;margin-top:18px}
+}
+</style></head>
+<body>
+<header class="no-print"><div class="wrap"><div class="brand"><div class="logo">HL</div><div><h1>Controle do CRO</h1><div class="sub">HAZE LAB COMPANY • Forecast de Marketing → Receita</div></div></div></div></header>
+<main class="wrap">
+<div class="tabs no-print"><button class="tab active" data-tab="forecast">Forecast</button><button class="tab" data-tab="benchmarks">Benchmarks & Metas</button></div>
+
+<section id="forecast" class="pane active"><div class="grid">
+<div class="card inputs"><h2>Identificação & premissas</h2>
+<div class="field"><label>Nome do cliente</label><input id="client" placeholder="Ex.: Empresa ABC"></div>
+<div class="field"><label>Mês</label><select id="month"><option>Janeiro</option><option>Fevereiro</option><option>Março</option><option>Abril</option><option>Maio</option><option>Junho</option><option>Julho</option><option>Agosto</option><option selected>Setembro</option><option>Outubro</option><option>Novembro</option><option>Dezembro</option></select></div>
+<div class="field"><label>Ano</label><input id="year" type="number" value="2026"></div>
+<div class="field"><label>Investimento bruto (R$)</label><input id="invest" type="number" value="5000"></div>
+<div class="field"><label>Imposto/custo mídia (%)</label><input id="tax" type="number" value="12.55" step=".01"></div>
+<div class="field"><label>CPL alvo (R$)</label><input id="cpl" type="number" value="15" step=".5"></div>
+<div class="field"><label>Lead → MQL (%)</label><input id="mql" type="number" value="30"></div>
+<div class="field"><label>MQL → SQL (%)</label><input id="sql" type="number" value="20"></div>
+<div class="field"><label>SQL → Venda (%)</label><input id="close" type="number" value="25"></div>
+<div class="field"><label>Nº SDRs</label><input id="sdrs" type="number" value="2" min="1"></div>
+<div class="field"><label>Ticket médio (R$)</label><input id="ticket" type="number" value="2000"></div>
+<div class="actions"><button class="btn" onclick="downloadPDF()">Gerar / Baixar Forecast em PDF</button></div>
+<p class="note">O PDF sai com nome do cliente, competência (mês/ano), premissas e projeções atuais.</p></div>
+
+<div class="card results"><h2>Forecast calculado</h2><div class="kpis">
+<div class="kpi"><small>Mídia líquida</small><strong id="net"></strong></div><div class="kpi"><small>Leads</small><strong id="leads"></strong></div>
+<div class="kpi"><small>MQLs</small><strong id="mqls"></strong></div><div class="kpi"><small>SQL / reuniões</small><strong id="meetings"></strong></div>
+<div class="kpi"><small>Contratos</small><strong id="sales"></strong></div><div class="kpi"><small>CAC mídia</small><strong id="cac"></strong></div>
+<div class="kpi"><small>Receita projetada</small><strong id="revenue"></strong></div><div class="kpi"><small>Lead → Venda</small><strong id="l2s"></strong></div>
+</div><div class="funnel"><div class="stage"><span>LEADS</span><b id="f_leads"></b></div><div class="stage"><span>MQL</span><b id="f_mql"></b></div><div class="stage"><span>SQL</span><b id="f_sql"></b></div><div class="stage"><span>VENDAS</span><b id="f_sales"></b></div><div class="stage"><span>RECEITA</span><b id="f_rev"></b></div></div></div>
+
+<div class="card full"><h2>Capacidade por SDR</h2><table><thead><tr><th>Indicador</th><th>Operação</th><th>Por SDR/mês</th><th>Por SDR/semana</th></tr></thead><tbody>
+<tr><td>Leads</td><td id="t_leads"></td><td id="s_leads"></td><td id="w_leads"></td></tr><tr><td>MQLs</td><td id="t_mql"></td><td id="s_mql"></td><td id="w_mql"></td></tr>
+<tr><td>SQL / reuniões</td><td id="t_sql"></td><td id="s_sql"></td><td id="w_sql"></td></tr><tr><td>Contratos originados</td><td id="t_sales"></td><td id="s_sales"></td><td id="w_sales"></td></tr>
+</tbody></table></div></div></section>
+
+<section id="benchmarks" class="pane"><div class="bench">
+<div class="card"><h2>Benchmarks de referência</h2><table><thead><tr><th>KPI</th><th>Benchmark pesquisado</th><th>Meta sugerida Haze</th></tr></thead><tbody>
+<tr><td>Lead → MQL</td><td>20–35% (HubSpot)</td><td><input id="bm_mql" type="number" value="30">%</td></tr>
+<tr><td>MQL → SQL</td><td>12–26% (HubSpot); PPC ~26% (First Page Sage)</td><td><input id="bm_sql" type="number" value="20">%</td></tr>
+<tr><td>SQL → Cliente</td><td>15–30% (HubSpot)</td><td><input id="bm_close" type="number" value="25">%</td></tr>
+<tr><td>Lead → Venda</td><td>~3,7% B2B geral (First Page Sage)</td><td><input id="bm_l2s" type="number" value="3" step=".1">%</td></tr>
+<tr><td>CPL</td><td>Deve ser calibrado por mercado/canal</td><td>R$ <input id="bm_cpl" type="number" value="15" step=".5"></td></tr>
+</tbody></table><p class="note">Os campos “Meta sugerida Haze” são editáveis. Benchmark externo orienta; baseline próprio do cliente deve prevalecer assim que houver dados suficientes.</p></div>
+<div class="card"><h2>Aplicar ao Forecast</h2><p class="note">Envia as metas sugeridas para a calculadora. Lead→Venda fica como KPI de comparação, pois o resultado é consequência das três conversões do funil.</p>
+<button class="btn" onclick="applyBench()">Aplicar metas sugeridas</button>
+<h2 style="margin-top:25px">Referências</h2><p class="source">HubSpot — benchmarks B2B de Lead→MQL, MQL→SQL e SQL→cliente.</p><p class="source">First Page Sage — benchmarks B2B/PPC de funil e conversão.</p></div></div></section>
+
+<section class="report" id="report">
+<div class="report-head"><h1>Forecast de Marketing → Receita</h1><div><b>Cliente:</b> <span id="r_client"></span></div><div class="meta"><b>Competência:</b> <span id="r_period"></span> • Controle do CRO — Haze Lab Company</div></div>
+<h2>Premissas do cenário</h2><div class="rgrid" id="r_inputs"></div>
+<h2>Projeção mensal</h2><div class="rgrid" id="r_results"></div>
+<h2>Funil projetado</h2><table><thead><tr><th>Etapa</th><th>Volume</th><th>Conversão aplicada</th></tr></thead><tbody id="r_funnel"></tbody></table>
+<h2>Distribuição comercial</h2><p id="r_capacity"></p>
+<h2>Leitura executiva</h2><p id="r_note"></p>
+<div class="foot">Documento gerado pelo Controle do CRO — Haze Lab Company. Forecast baseado em premissas editáveis e referências externas. Não constitui garantia de resultado; o baseline real do cliente deve substituir benchmarks conforme a operação acumular dados.</div>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id),brl=n=>n.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:2}),n0=n=>Math.round(n).toLocaleString('pt-BR'),n1=n=>n.toLocaleString('pt-BR',{maximumFractionDigits:1});let L={};
+function calc(){let invest=+$('invest').value||0,tax=+$('tax').value||0,cpl=+$('cpl').value||1,mqlr=(+$('mql').value||0)/100,sqlr=(+$('sql').value||0)/100,closer=(+$('close').value||0)/100,sdrs=Math.max(1,+$('sdrs').value||1),ticket=+$('ticket').value||0;
+let net=invest*(1-tax/100),leads=net/cpl,mql=leads*mqlr,sql=mql*sqlr,sales=sql*closer,rev=sales*ticket,l2s=leads?sales/leads:0;L={invest,tax,cpl,mqlr,sqlr,closer,sdrs,ticket,net,leads,mql,sql,sales,rev,l2s};
+$('net').textContent=brl(net);$('leads').textContent=n0(leads);$('mqls').textContent=n0(mql);$('meetings').textContent=n0(sql);$('sales').textContent=n1(sales);$('cac').textContent=sales?brl(net/sales):'—';$('revenue').textContent=brl(rev);$('l2s').textContent=(l2s*100).toFixed(2).replace('.',',')+'%';
+$('f_leads').textContent=n0(leads);$('f_mql').textContent=n0(mql);$('f_sql').textContent=n0(sql);$('f_sales').textContent=n1(sales);$('f_rev').textContent=brl(rev);
+[['t_leads',leads],['t_mql',mql],['t_sql',sql],['t_sales',sales]].forEach(x=>$(x[0]).textContent=n1(x[1]));
+$('s_leads').textContent=n1(leads/sdrs);$('s_mql').textContent=n1(mql/sdrs);$('s_sql').textContent=n1(sql/sdrs);$('s_sales').textContent=n1(sales/sdrs);
+$('w_leads').textContent=n1(leads/sdrs/4.33);$('w_mql').textContent=n1(mql/sdrs/4.33);$('w_sql').textContent=n1(sql/sdrs/4.33);$('w_sales').textContent=n1(sales/sdrs/4.33);}
+function applyBench(){$('mql').value=$('bm_mql').value;$('sql').value=$('bm_sql').value;$('close').value=$('bm_close').value;$('cpl').value=$('bm_cpl').value;calc();document.querySelector('[data-tab=forecast]').click();}
+function box(label,value){return `<div class="rbox"><small>${label}</small><b>${value}</b></div>`}
+function downloadPDF(){calc();let client=$('client').value.trim()||'Cliente';let period=$('month').value+' / '+$('year').value;$('r_client').textContent=client;$('r_period').textContent=period;
+$('r_inputs').innerHTML=box('Investimento bruto',brl(L.invest))+box('Imposto/custo',L.tax.toFixed(2).replace('.',',')+'%')+box('Mídia líquida',brl(L.net))+box('CPL alvo',brl(L.cpl))+box('Lead → MQL',(L.mqlr*100).toFixed(1).replace('.',',')+'%')+box('MQL → SQL',(L.sqlr*100).toFixed(1).replace('.',',')+'%')+box('SQL → Venda',(L.closer*100).toFixed(1).replace('.',',')+'%')+box('SDRs',L.sdrs)+box('Ticket médio',brl(L.ticket));
+$('r_results').innerHTML=box('Leads',n0(L.leads))+box('MQLs',n0(L.mql))+box('SQL / reuniões',n0(L.sql))+box('Contratos',n1(L.sales))+box('CAC de mídia',L.sales?brl(L.net/L.sales):'—')+box('Receita projetada',brl(L.rev));
+$('r_funnel').innerHTML=`<tr><td>Leads</td><td>${n0(L.leads)}</td><td>100%</td></tr><tr><td>MQL</td><td>${n0(L.mql)}</td><td>${(L.mqlr*100).toFixed(1).replace('.',',')}%</td></tr><tr><td>SQL / reuniões</td><td>${n0(L.sql)}</td><td>${(L.sqlr*100).toFixed(1).replace('.',',')}%</td></tr><tr><td>Vendas</td><td>${n1(L.sales)}</td><td>${(L.closer*100).toFixed(1).replace('.',',')}%</td></tr>`;
+$('r_capacity').innerHTML=`Com <b>${L.sdrs} SDR(s)</b>, a distribuição projetada é de <b>${n1(L.leads/L.sdrs)} leads</b>, <b>${n1(L.mql/L.sdrs)} MQLs</b> e <b>${n1(L.sql/L.sdrs)} reuniões</b> por SDR/mês.`;
+$('r_note').innerHTML=`O cenário projeta conversão total Lead→Venda de <b>${(L.l2s*100).toFixed(2).replace('.',',')}%</b>. A gestão deve acompanhar aquisição, qualidade, pipeline e receita conjuntamente; CPL isolado não determina eficiência econômica.`;
+document.title=`Forecast - ${client} - ${$('month').value} ${$('year').value}`;setTimeout(()=>window.print(),100);}
+document.querySelectorAll('input,select').forEach(x=>x.addEventListener('input',calc));document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.pane').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.tab).classList.add('active')});calc();
+</script></body></html>
