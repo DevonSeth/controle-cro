@@ -21,7 +21,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px;bord
 .report{display:none}
 @media(max-width:850px){.inputs,.results{grid-column:1/-1}.kpis{grid-template-columns:repeat(2,1fr)}.funnel{grid-template-columns:1fr}.bench{grid-template-columns:1fr}}
 @media print{
- body{background:white;color:#19151f}.no-print,header,.tabs,.pane{display:none!important}.report{display:block!important;padding:0}
+ body{background:white;color:#19151f}.no-print,header,.tabs,.pane{display:none!important}.report{display:none!important;padding:0}.report.print-target{display:block!important}
  @page{size:A4;margin:13mm}.report-head{border-bottom:4px solid #6C3CF0;padding-bottom:10px;margin-bottom:15px}
  .report h1{font-size:24px;color:#33205f}.report h2{font-size:15px;color:#5630c6;margin:17px 0 8px}
  .meta{font-size:11px;color:#625b6b}.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.rbox{border:1px solid #ddd6e7;border-radius:8px;padding:8px}
@@ -30,9 +30,9 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px;bord
 }
 </style></head>
 <body>
-<header class="no-print"><div class="wrap"><div class="brand"><div class="logo">HL</div><div><h1>Controle do CRO</h1><div class="sub">HAZE LAB COMPANY • Forecast de Marketing → Receita</div></div></div></div></header>
+<header class="no-print"><div class="wrap"><div class="brand"><img src="logo.svg" alt="Haze Lab" style="height:50px;width:auto;"><div><h1>Controle do CRO</h1><div class="sub">HAZE LAB COMPANY • Forecast de Marketing → Receita</div></div></div></div></header>
 <main class="wrap">
-<div class="tabs no-print"><button class="tab active" data-tab="forecast">Forecast</button><button class="tab" data-tab="benchmarks">Benchmarks & Metas</button></div>
+<div class="tabs no-print"><button class="tab active" data-tab="forecast">Forecast</button><button class="tab" data-tab="real">Funil Real</button><button class="tab" data-tab="benchmarks">Benchmarks & Metas</button></div>
 
 <section id="forecast" class="pane active"><div class="grid">
 <div class="card inputs"><h2>Identificação & premissas</h2>
@@ -62,6 +62,37 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px;bord
 <tr><td>SQL / reuniões</td><td id="t_sql"></td><td id="s_sql"></td><td id="w_sql"></td></tr><tr><td>Contratos originados</td><td id="t_sales"></td><td id="s_sales"></td><td id="w_sales"></td></tr>
 </tbody></table></div></div></section>
 
+
+<section id="real" class="pane"><div class="grid">
+<div class="card inputs"><h2>Dados realizados</h2>
+<div class="field"><label>Nome do cliente / operação</label><input id="real_client" placeholder="Ex.: Empresa ABC"></div>
+<div class="field"><label>Mês</label><select id="real_month"><option>Janeiro</option><option>Fevereiro</option><option>Março</option><option>Abril</option><option>Maio</option><option>Junho</option><option>Julho</option><option>Agosto</option><option>Setembro</option><option selected>Outubro</option><option>Novembro</option><option>Dezembro</option></select></div>
+<div class="field"><label>Ano</label><input id="real_year" type="number" value="2026"></div>
+<div class="field"><label>Leads recebidos</label><input id="r_leads_in" type="number" value="20" min="0"></div>
+<div class="field"><label>Leads qualificados</label><input id="r_qual_in" type="number" value="8" min="0"></div>
+<div class="field"><label>Reuniões agendadas</label><input id="r_sched_in" type="number" value="3" min="0"></div>
+<div class="field"><label>Reuniões realizadas</label><input id="r_held_in" type="number" value="3" min="0"></div>
+<div class="field"><label>Propostas enviadas</label><input id="r_prop_in" type="number" value="1" min="0"></div>
+<div class="field"><label>Vendas</label><input id="r_sales_in" type="number" value="1" min="0"></div>
+<div class="field"><label>Receita realizada (R$)</label><input id="r_rev_in" type="number" value="2000" min="0" step="100"></div>
+<div class="field"><label>Investimento em mídia (R$)</label><input id="r_invest_in" type="number" value="0" min="0" step="100"></div>
+<div class="actions"><button class="btn" onclick="downloadRealPDF()">Gerar / Baixar Funil Real em PDF</button></div><p class="note">Preencha os volumes reais. As taxas e indicadores são calculados automaticamente. O PDF registra o retrato realizado da operação e suas taxas.</p></div>
+<div class="card results"><h2>Conversões reais</h2><div class="kpis">
+<div class="kpi"><small>Lead → Qualificado</small><strong id="rr_lq"></strong></div>
+<div class="kpi"><small>Qualificado → Agendamento</small><strong id="rr_qs"></strong></div>
+<div class="kpi"><small>Show rate</small><strong id="rr_show"></strong></div>
+<div class="kpi"><small>Reunião → Proposta</small><strong id="rr_hp"></strong></div>
+<div class="kpi"><small>Reunião → Venda</small><strong id="rr_hsale"></strong></div>
+<div class="kpi"><small>Lead → Venda</small><strong id="rr_lsale"></strong></div>
+<div class="kpi"><small>Ticket médio</small><strong id="rr_ticket"></strong></div>
+<div class="kpi"><small>CAC de mídia</small><strong id="rr_cac"></strong></div>
+</div><div class="funnel" style="grid-template-columns:repeat(6,1fr)">
+<div class="stage"><span>LEADS</span><b id="rf_leads"></b></div><div class="stage"><span>QUALIFICADOS</span><b id="rf_qual"></b></div><div class="stage"><span>AGENDADAS</span><b id="rf_sched"></b></div><div class="stage"><span>REALIZADAS</span><b id="rf_held"></b></div><div class="stage"><span>PROPOSTAS</span><b id="rf_prop"></b></div><div class="stage"><span>VENDAS</span><b id="rf_sales"></b></div></div></div>
+<div class="card full"><h2>Eficiência & perdas do funil</h2><table><thead><tr><th>Indicador</th><th>Resultado</th></tr></thead><tbody>
+<tr><td>Leads não qualificados / não avançados</td><td id="loss_qual"></td></tr><tr><td>Qualificados sem agendamento</td><td id="loss_sched"></td></tr><tr><td>No-show / reuniões não realizadas</td><td id="loss_show"></td></tr><tr><td>Reuniões sem proposta</td><td id="loss_prop"></td></tr><tr><td>Reuniões não convertidas em venda</td><td id="loss_sale"></td></tr><tr><td>CPL real</td><td id="rr_cpl"></td></tr><tr><td>Custo por qualificado</td><td id="rr_cpq"></td></tr><tr><td>Custo por reunião realizada</td><td id="rr_cpm"></td></tr><tr><td>ROAS</td><td id="rr_roas"></td></tr><tr><td>Receita por lead</td><td id="rr_rpl"></td></tr>
+</tbody></table><p class="note">Taxas usam a etapa imediatamente anterior como denominador. Se um campo estiver zerado, o indicador correspondente aparece como “—”.</p></div>
+</div></section>
+
 <section id="benchmarks" class="pane"><div class="bench">
 <div class="card"><h2>Benchmarks de referência</h2><table><thead><tr><th>KPI</th><th>Benchmark pesquisado</th><th>Meta sugerida Haze</th></tr></thead><tbody>
 <tr><td>Lead → MQL</td><td>20–35% (HubSpot)</td><td><input id="bm_mql" type="number" value="30">%</td></tr>
@@ -83,6 +114,16 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px;bord
 <h2>Leitura executiva</h2><p id="r_note"></p>
 <div class="foot">Documento gerado pelo Controle do CRO — Haze Lab Company. Forecast baseado em premissas editáveis e referências externas. Não constitui garantia de resultado; o baseline real do cliente deve substituir benchmarks conforme a operação acumular dados.</div>
 </section>
+<section class="report" id="realReport">
+<div class="report-head"><h1>Funil Real — Performance Comercial</h1><div><b>Cliente / operação:</b> <span id="rr_client_pdf"></span></div><div class="meta"><b>Competência:</b> <span id="rr_period_pdf"></span> • Controle do CRO — Haze Lab Company</div></div>
+<h2>Volumes realizados</h2><div class="rgrid" id="rr_volumes_pdf"></div>
+<h2>Conversões reais</h2><div class="rgrid" id="rr_rates_pdf"></div>
+<h2>Eficiência econômica</h2><div class="rgrid" id="rr_econ_pdf"></div>
+<h2>Perdas por etapa</h2><table><thead><tr><th>Etapa / indicador</th><th>Volume perdido</th></tr></thead><tbody id="rr_losses_pdf"></tbody></table>
+<h2>Leitura executiva</h2><p id="rr_note_pdf"></p>
+<div class="foot">Documento gerado pelo Controle do CRO — Haze Lab Company. Indicadores calculados a partir dos volumes realizados informados pelo usuário. Taxas com denominador zero são exibidas como “—”.</div>
+</section>
+
 </main>
 <script>
 const $=id=>document.getElementById(id),brl=n=>n.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:2}),n0=n=>Math.round(n).toLocaleString('pt-BR'),n1=n=>n.toLocaleString('pt-BR',{maximumFractionDigits:1});let L={};
@@ -95,12 +136,29 @@ $('s_leads').textContent=n1(leads/sdrs);$('s_mql').textContent=n1(mql/sdrs);$('s
 $('w_leads').textContent=n1(leads/sdrs/4.33);$('w_mql').textContent=n1(mql/sdrs/4.33);$('w_sql').textContent=n1(sql/sdrs/4.33);$('w_sales').textContent=n1(sales/sdrs/4.33);}
 function applyBench(){$('mql').value=$('bm_mql').value;$('sql').value=$('bm_sql').value;$('close').value=$('bm_close').value;$('cpl').value=$('bm_cpl').value;calc();document.querySelector('[data-tab=forecast]').click();}
 function box(label,value){return `<div class="rbox"><small>${label}</small><b>${value}</b></div>`}
-function downloadPDF(){calc();let client=$('client').value.trim()||'Cliente';let period=$('month').value+' / '+$('year').value;$('r_client').textContent=client;$('r_period').textContent=period;
+function downloadPDF(){calc();document.querySelectorAll('.report').forEach(x=>x.classList.remove('print-target'));$('report').classList.add('print-target');let client=$('client').value.trim()||'Cliente';let period=$('month').value+' / '+$('year').value;$('r_client').textContent=client;$('r_period').textContent=period;
 $('r_inputs').innerHTML=box('Investimento bruto',brl(L.invest))+box('Imposto/custo',L.tax.toFixed(2).replace('.',',')+'%')+box('Mídia líquida',brl(L.net))+box('CPL alvo',brl(L.cpl))+box('Lead → MQL',(L.mqlr*100).toFixed(1).replace('.',',')+'%')+box('MQL → SQL',(L.sqlr*100).toFixed(1).replace('.',',')+'%')+box('SQL → Venda',(L.closer*100).toFixed(1).replace('.',',')+'%')+box('SDRs',L.sdrs)+box('Ticket médio',brl(L.ticket));
 $('r_results').innerHTML=box('Leads',n0(L.leads))+box('MQLs',n0(L.mql))+box('SQL / reuniões',n0(L.sql))+box('Contratos',n1(L.sales))+box('CAC de mídia',L.sales?brl(L.net/L.sales):'—')+box('Receita projetada',brl(L.rev));
 $('r_funnel').innerHTML=`<tr><td>Leads</td><td>${n0(L.leads)}</td><td>100%</td></tr><tr><td>MQL</td><td>${n0(L.mql)}</td><td>${(L.mqlr*100).toFixed(1).replace('.',',')}%</td></tr><tr><td>SQL / reuniões</td><td>${n0(L.sql)}</td><td>${(L.sqlr*100).toFixed(1).replace('.',',')}%</td></tr><tr><td>Vendas</td><td>${n1(L.sales)}</td><td>${(L.closer*100).toFixed(1).replace('.',',')}%</td></tr>`;
 $('r_capacity').innerHTML=`Com <b>${L.sdrs} SDR(s)</b>, a distribuição projetada é de <b>${n1(L.leads/L.sdrs)} leads</b>, <b>${n1(L.mql/L.sdrs)} MQLs</b> e <b>${n1(L.sql/L.sdrs)} reuniões</b> por SDR/mês.`;
 $('r_note').innerHTML=`O cenário projeta conversão total Lead→Venda de <b>${(L.l2s*100).toFixed(2).replace('.',',')}%</b>. A gestão deve acompanhar aquisição, qualidade, pipeline e receita conjuntamente; CPL isolado não determina eficiência econômica.`;
 document.title=`Forecast - ${client} - ${$('month').value} ${$('year').value}`;setTimeout(()=>window.print(),100);}
-document.querySelectorAll('input,select').forEach(x=>x.addEventListener('input',calc));document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.pane').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.tab).classList.add('active')});calc();
+
+function pct(a,b){return b>0?(a/b*100).toFixed(2).replace('.',',')+'%':'—'}
+function calcReal(){let leads=+$('r_leads_in').value||0,qual=+$('r_qual_in').value||0,sched=+$('r_sched_in').value||0,held=+$('r_held_in').value||0,prop=+$('r_prop_in').value||0,sales=+$('r_sales_in').value||0,rev=+$('r_rev_in').value||0,invest=+$('r_invest_in').value||0;
+$('rr_lq').textContent=pct(qual,leads);$('rr_qs').textContent=pct(sched,qual);$('rr_show').textContent=pct(held,sched);$('rr_hp').textContent=pct(prop,held);$('rr_hsale').textContent=pct(sales,held);$('rr_lsale').textContent=pct(sales,leads);$('rr_ticket').textContent=sales?brl(rev/sales):'—';$('rr_cac').textContent=sales&&invest?brl(invest/sales):'—';
+$('rf_leads').textContent=n0(leads);$('rf_qual').textContent=n0(qual);$('rf_sched').textContent=n0(sched);$('rf_held').textContent=n0(held);$('rf_prop').textContent=n0(prop);$('rf_sales').textContent=n0(sales);
+$('loss_qual').textContent=n0(Math.max(0,leads-qual));$('loss_sched').textContent=n0(Math.max(0,qual-sched));$('loss_show').textContent=n0(Math.max(0,sched-held));$('loss_prop').textContent=n0(Math.max(0,held-prop));$('loss_sale').textContent=n0(Math.max(0,held-sales));
+$('rr_cpl').textContent=leads&&invest?brl(invest/leads):'—';$('rr_cpq').textContent=qual&&invest?brl(invest/qual):'—';$('rr_cpm').textContent=held&&invest?brl(invest/held):'—';$('rr_roas').textContent=invest?(rev/invest).toFixed(2).replace('.',',')+'x':'—';$('rr_rpl').textContent=leads?brl(rev/leads):'—';}
+function downloadRealPDF(){calcReal();document.querySelectorAll('.report').forEach(x=>x.classList.remove('print-target'));$('realReport').classList.add('print-target');
+let client=$('real_client').value.trim()||'Operação';let period=$('real_month').value+' / '+$('real_year').value;
+let leads=+$('r_leads_in').value||0,qual=+$('r_qual_in').value||0,sched=+$('r_sched_in').value||0,held=+$('r_held_in').value||0,prop=+$('r_prop_in').value||0,sales=+$('r_sales_in').value||0,rev=+$('r_rev_in').value||0,invest=+$('r_invest_in').value||0;
+$('rr_client_pdf').textContent=client;$('rr_period_pdf').textContent=period;
+$('rr_volumes_pdf').innerHTML=box('Leads recebidos',n0(leads))+box('Qualificados',n0(qual))+box('Reuniões agendadas',n0(sched))+box('Reuniões realizadas',n0(held))+box('Propostas',n0(prop))+box('Vendas',n0(sales));
+$('rr_rates_pdf').innerHTML=box('Lead → Qualificado',pct(qual,leads))+box('Qualificado → Agendamento',pct(sched,qual))+box('Show rate',pct(held,sched))+box('Reunião → Proposta',pct(prop,held))+box('Reunião → Venda',pct(sales,held))+box('Lead → Venda',pct(sales,leads));
+$('rr_econ_pdf').innerHTML=box('Receita realizada',brl(rev))+box('Investimento em mídia',brl(invest))+box('Ticket médio',sales?brl(rev/sales):'—')+box('CPL real',leads&&invest?brl(invest/leads):'—')+box('CAC de mídia',sales&&invest?brl(invest/sales):'—')+box('ROAS',invest?(rev/invest).toFixed(2).replace('.',',')+'x':'—')+box('Custo por qualificado',qual&&invest?brl(invest/qual):'—')+box('Custo por reunião',held&&invest?brl(invest/held):'—')+box('Receita por lead',leads?brl(rev/leads):'—');
+$('rr_losses_pdf').innerHTML=`<tr><td>Leads não qualificados / não avançados</td><td>${n0(Math.max(0,leads-qual))}</td></tr><tr><td>Qualificados sem agendamento</td><td>${n0(Math.max(0,qual-sched))}</td></tr><tr><td>No-show / reuniões não realizadas</td><td>${n0(Math.max(0,sched-held))}</td></tr><tr><td>Reuniões sem proposta</td><td>${n0(Math.max(0,held-prop))}</td></tr><tr><td>Reuniões não convertidas em venda</td><td>${n0(Math.max(0,held-sales))}</td></tr>`;
+$('rr_note_pdf').innerHTML=`A operação converteu <b>${pct(qual,leads)}</b> dos leads em qualificados, apresentou show rate de <b>${pct(held,sched)}</b> e conversão de reunião realizada em venda de <b>${pct(sales,held)}</b>. A conversão total Lead→Venda foi de <b>${pct(sales,leads)}</b>${invest?`, com CAC de mídia de <b>${sales?brl(invest/sales):'—'}</b> e ROAS de <b>${(rev/invest).toFixed(2).replace('.',',')}x</b>`:''}.`;
+document.title=`Funil Real - ${client} - ${$('real_month').value} ${$('real_year').value}`;setTimeout(()=>window.print(),100);}
+document.querySelectorAll('input,select').forEach(x=>x.addEventListener('input',()=>{calc();calcReal()}));document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.pane').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.tab).classList.add('active')});calc();calcReal();
 </script></body></html>
